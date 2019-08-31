@@ -1,0 +1,8 @@
+[package]
+name = "spam-reaper"
+version = "0.1.0"
+authors = ["Rustocats"]
+edition = "2018"
+
+[dependencies]
+octokit = { path = "../octokit" }
