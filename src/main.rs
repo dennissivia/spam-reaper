@@ -25,6 +25,26 @@ fn delete_issue_comments(token: &String, nwo: &String, username: &str) {
     }
 }
 
+fn jwt_me() {
+    //    let key_path = "./octorust-dev.2019-07-24.private-key.pem";
+    let key_path = env::var("KEY_FILE").expect("KEY_FILE is not set");
+    let app_id = env::var("APP_ID").expect("APP_ID is required");
+    let result = octokit::generate_jwt(&key_path, &app_id);
+    match result {
+        Ok(data) => {
+            println!("Generated JWT\n{}", data);
+            let maybe_app = octokit::get_app(&data);
+            match maybe_app {
+                Some(app) => println!("Current app is: {:?}", app),
+                None => println!("failed to load app"),
+            }
+        }
+        Err(err) => {
+            println!("All failed:\n{}", err);
+        }
+    }
+}
+
 fn spam_ping_pong(token: &String, nwo: &String, body: &str) {
     let issue_number = 2;
     let result = octokit::create_issue_comment(token, issue_number, &nwo, String::from(body));
@@ -49,7 +69,7 @@ fn main() {
     // let filterSpammyContent = |comment: octokit::IssueComment| comment.body == spammy_body;
 
     spam_ping_pong(&token, &nwo, spammy_body);
-
     delete_review_comments(&token, &nwo, spammy_user);
     delete_issue_comments(&token, &nwo, spammy_user);
+    jwt_me();
 }
